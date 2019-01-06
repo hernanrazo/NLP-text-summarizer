@@ -16,6 +16,17 @@ custom = ['?','(', ')', '.', '[', ']','!', '...',
 ';',"`","'",'"',',','-','$', "'s", "'ll", 'ca', "n't", "'m", "'re", "'ve"]
 stop_words.extend(custom)
 
+def main():
+
+	article = open_file(article_path)
+	sentence_length = 6
+	sentence_data = clean_data(article)
+	word_data = clean_data(article)
+	sentence_scores = scoring(sentence_data, word_data)
+	summary = get_summary(sentence_scores, sentence_data, sentence_length)
+
+	return summary
+
 
 def open_file(article_path):
 
@@ -27,29 +38,40 @@ def open_file(article_path):
 		print('Error trying to read file')
 
 
-def clean_data():
-
-	filtered_words = []
-	filtered_sent = []
+def clean_data(article):
 
 	data = open_file(article_path)
 	data = data.lower()
 
 	tokenized_words = nltk.word_tokenize(data)
-	tokenized_sent = nltk.sent_tokenize(data)
-	tokenized_words = [words for words in tokenized_words if not words in stop_words]
-
-	for words in tokenized_words:
-		if words not in stop_words:
-			filtered_words.append(words)
+	
+	
+	return [nltk.sent_tokenize(data), [word for word in data if word not in stop_words]]
 
 
-	for words in tokenized_sent:
-		if words not in stop_words:
-			filtered_sent.append(words)
+def scoring(filtered_words, filtered_sent):
 
-	return(filtered_words)
-	return(filtered_sent)
+	word_frequency = FreqDist(filtered_words)
+
+	scoring = defaultdict(int)
+
+	for i, sentence in enumerate(filtered_sent):
+		for words in word_tokenize(sentence.lower()):
+			if words in word_frequency:
+
+				scoring[i] += word_frequency[words]
+
+	return scoring
+
+def get_summary(scores, sentence, length):
+
+	indexes = nlargest(length, scores, key=scores.get)
+	final_sentence = [sentence[j] for j in sorted(indexes)]
+	summary = ' '.join(final_sentence)
+	
+	return summary
 
 
-#clean_data()
+if __name__ == "__main__":
+
+	print(main())
