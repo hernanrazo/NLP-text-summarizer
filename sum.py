@@ -2,7 +2,6 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords
-from string import punctuation
 from nltk.probability import FreqDist
 from heapq import nlargest
 from collections import defaultdict
@@ -12,66 +11,58 @@ from collections import defaultdict
 
 article_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/article.txt')
 stop_words = nltk.corpus.stopwords.words('english')
-custom = ['?','(', ')', '.', '[', ']','!', '...',
-';',"`","'",'"',',','-','$', "'s", "'ll", 'ca', "n't", "'m", "'re", "'ve"]
+custom = ['?','(', ')', '.', '[', ']','!'  ,
+';',"`","'",'"',',','-',':','’', '$', "'s", "'ll", 'ca', "n't", "'m", "'re", "'ve"]
 stop_words.extend(custom)
 
 def main():
 
-	article = open_file(article_path)
-	sentence_length = 6
-	sentence_data = clean_data(article)
-	word_data = clean_data(article)
-	sentence_scores = scoring(sentence_data, word_data)
-	summary = get_summary(sentence_scores, sentence_data, sentence_length)
+	words = get_word_tokens()
+	print(words)
 
-	return summary
+	sentences = get_sent_tokens()
+	print(sentences)
 
+	score = get_score(words, sentences)
 
-def open_file(article_path):
-
-	try:
-		with open(article_path, 'r') as file:
-			return file.read()
-
-	except IOError as e:
-		print('Error trying to read file')
+	print(score)
 
 
-def clean_data(article):
+def get_word_tokens():
 
-	data = open_file(article_path)
+	data = open(article_path, 'r').read()
 	data = data.lower()
 
-	tokenized_words = nltk.word_tokenize(data)
-	
-	
-	return [nltk.sent_tokenize(data), [word for word in data if word not in stop_words]]
+	tokenized_words = word_tokenize(data)
+	tokenized_words = [word for word in tokenized_words if word not in stop_words]
+
+	return tokenized_words
+
+def get_sent_tokens():
+
+	data = open(article_path, 'r').read()
+	data = data.lower()
+
+	tokenized_sent = sent_tokenize(data)
+	tokenized_sent = [word for word in tokenized_sent if word not in stop_words]
+
+	return tokenized_sent
 
 
-def scoring(filtered_words, filtered_sent):
+def get_score(words, sentences):
 
-	word_frequency = FreqDist(filtered_words)
+	word_frequency = FreqDist(words)
 
-	scoring = defaultdict(int)
+	score = defaultdict(int)
 
-	for i, sentence in enumerate(filtered_sent):
-		for words in word_tokenize(sentence.lower()):
-			if words in word_frequency:
+	for i, sentence in enumerate(sentences):
+		for word in nltk.word_tokenize(sentences):
+			if word in word_frequency:
+				score[i] += word_freq[word]
 
-				scoring[i] += word_frequency[words]
-
-	return scoring
-
-def get_summary(scores, sentence, length):
-
-	indexes = nlargest(length, scores, key=scores.get)
-	final_sentence = [sentence[j] for j in sorted(indexes)]
-	summary = ' '.join(final_sentence)
-	
-	return summary
+	return score
 
 
 if __name__ == "__main__":
 
-	print(main())
+	main()
