@@ -11,21 +11,9 @@ from collections import defaultdict
 
 article_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/article.txt')
 stop_words = nltk.corpus.stopwords.words('english')
-custom = ['?','(', ')', '.', '[', ']','!'  ,
+custom = ['?','(', ')', '.', '[', ']','!' ,
 ';',"`","'",'"',',','-',':','’', '$', "'s", "'ll", 'ca', "n't", "'m", "'re", "'ve"]
 stop_words.extend(custom)
-
-def main():
-
-	words = get_word_tokens()
-	print(words)
-
-	sentences = get_sent_tokens()
-	print(sentences)
-
-	score = get_score(words, sentences)
-
-	print(score)
 
 
 def get_word_tokens():
@@ -49,20 +37,44 @@ def get_sent_tokens():
 	return tokenized_sent
 
 
-def get_score(words, sentences):
+def get_freq_dist(words):
 
-	word_frequency = FreqDist(words)
+	freq_dist = dict()
 
-	score = defaultdict(int)
+	for word in words:
+		if word in freq_dist:
+			freq_dist[word] += 1
+		else:
+			freq_dist[word] = 1
 
-	for i, sentence in enumerate(sentences):
-		for word in nltk.word_tokenize(sentences):
-			if word in word_frequency:
-				score[i] += word_freq[word]
+	return freq_dist
 
-	return score
+def get_score(sentences, freq_dist):
+
+	sent_value = dict()
+
+	#this is all wrong
+	for sentence in sentences:
+		for word_value in freq_dist:
+			if sentence[:12] in sent_value:
+				sent_value[sentence[:12]] += word_value[1]
+			else:
+				sent_value[sentence[:12]] = word_value[1]
 
 
-if __name__ == "__main__":
 
-	main()
+
+
+
+words = get_word_tokens()
+sentences = get_sent_tokens()
+
+get_freq_dist(words)
+
+
+
+
+
+
+
+
