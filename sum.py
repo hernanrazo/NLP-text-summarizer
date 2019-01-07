@@ -15,6 +15,7 @@ custom = ['?','(', ')', '.', '[', ']','!' ,
 ';',"`","'",'"',',','-',':','’', '$', "'s", "'ll", 'ca', "n't", "'m", "'re", "'ve"]
 stop_words.extend(custom)
 
+length = 5
 
 def get_word_tokens():
 
@@ -49,32 +50,34 @@ def get_freq_dist(words):
 
 	return freq_dist
 
-def get_score(sentences, freq_dist):
+def get_score(words, sentences, freq_dist):
 
-	sent_value = dict()
+	score = defaultdict(int)
 
-	#this is all wrong
-	for sentence in sentences:
-		for word_value in freq_dist:
-			if sentence[:12] in sent_value:
-				sent_value[sentence[:12]] += word_value[1]
-			else:
-				sent_value[sentence[:12]] = word_value[1]
+	for counter, sentence in enumerate(sentences):
+		for word in words:
+			if word in freq_dist:
+				score[counter] += freq_dist[word]
 
+	return score
 
+def get_summary(score, sentences, length):
 
+	index = nlargest(length, score, key=score.get)
+	summary = [sentences[i] for i in sorted(index)]
+	result = ' '.join(summary)
 
+	return result
 
 
 words = get_word_tokens()
 sentences = get_sent_tokens()
 
-get_freq_dist(words)
+freq_dist = get_freq_dist(words)
 
+score = get_score(words, sentences, freq_dist)
 
-
-
-
-
-
+summary = get_summary(score, sentences, length)
+#clean this and put in a new txt file??
+print(summary)
 
