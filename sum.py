@@ -17,7 +17,8 @@ summary_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/sum.txt')
 #set stopwords with a few customs
 stop_words = nltk.corpus.stopwords.words('english')
 custom = ['?','(', ')', '.', '[', ']','!' ,
-';',"`","'",'"',',','-',':','’', '$', "'s", "'ll", 'ca', "n't", "'m", "'re", "'ve"]
+';',"`","'",'"',',','-',':','’', '$', "'s", 
+"'ll", 'ca', "n't", "'m", "'re", "'ve"]
 stop_words.extend(custom)
 
 #set number of sentences for the summary
@@ -74,27 +75,27 @@ def get_freq_dist(words):
 	return freq_dist
 
 #calculate the scores of each sentence
+#TODO: make this better
 def get_score(words, sentences, freq_dist):
 
-	score = defaultdict(int)
+	max_freq = max(freq_dist.values())
+	score = {}
 
-	#iterate through each unique sentence
-	for counter, sentence in enumerate(sentences):
+	for word in freq_dist.keys():
+		freq_dist[word] = freq_dist[word] / max_freq
 
-		#iterate through each word
-		for word in words:
-
-			#if the word is in the frequency distribution
-			if word in freq_dist:
-
-				#add each word's frequency value to the 
-				#sentence's total score
-				score[counter] += freq_dist[word]
+	for sentence in sentences:
+		for word in nltk.word_tokenize(sentences):
+			if word in freq_dist.keys():
+				if sentence not in score.keys():
+					score[sentence] = freq_dist[word]
+				else:
+					score[sent] += freq_dist[word]
 
 	return score
 
-#set function to decide which sentences to include in
-#the summary
+#set function to decide which sentences to 
+#include in the summary
 def get_summary(score, sentences, length):
 
 	#create an index of scores
@@ -108,7 +109,6 @@ def get_summary(score, sentences, length):
 	result = ' '.join(summary)
 
 	return result
-	return index
 
 #call tokenization functions for words and sentences
 words = get_word_tokens()
