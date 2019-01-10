@@ -17,7 +17,7 @@ summary_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/sum.txt')
 #set stopwords with a few customs
 stop_words = nltk.corpus.stopwords.words('english')
 custom = ['?','(', ')', '.', '[', ']','!' ,
-';',"`","'",'"',',','-',':','’', '$', "'s", 
+';',"`","'",'"',',','-',':','’', '$',"'s", 
 "'ll", 'ca', "n't", "'m", "'re", "'ve"]
 stop_words.extend(custom)
 
@@ -40,7 +40,7 @@ def get_word_tokens():
 	#filter out stopwords
 	tokenized_words = [word for word in tokenized_words if word not in stop_words]
 
-	return tokenized_words
+	return str(tokenized_words)
 
 #set function to filter 
 def get_sent_tokens():
@@ -57,7 +57,7 @@ def get_sent_tokens():
 	#filter out stopwords
 	tokenized_sent = [word for word in tokenized_sent if word not in stop_words]
 
-	return tokenized_sent
+	return str(tokenized_sent)
 
 #calculate frequency distribution
 def get_freq_dist(words):
@@ -79,22 +79,23 @@ def get_freq_dist(words):
 def get_score(words, sentences, freq_dist):
 
 	max_freq = max(freq_dist.values())
-	score = {}
+	sent_tokens = nltk.word_tokenize(sentences)
 
-	for word in freq_dist.keys():
-		freq_dist[word] = freq_dist[word] / max_freq
+	score = {}
+	#default = 'the'
+	#freq_dist = freq_dist.get('the', default)
 
 	for sentence in sentences:
-		for word in nltk.word_tokenize(sentences):
-			if word in freq_dist.keys():
-				if sentence not in score.keys():
-					score[sentence] = freq_dist[word]
-				else:
-					score[sent] += freq_dist[word]
+		for word in sent_tokens:
+			if sentence not in score.keys():
+				score[sentence] = freq_dist[word]
+			else:
+				score[sentence] += freq_dist[word]
 
 	return score
+	
 
-#set function to decide which sentences to 
+#define function that decides which sentences to 
 #include in the summary
 def get_summary(score, sentences, length):
 
@@ -114,6 +115,7 @@ def get_summary(score, sentences, length):
 words = get_word_tokens()
 sentences = get_sent_tokens()
 
+
 #call functions to get the frequency distribution and 
 #the score for each sentence
 freq_dist = get_freq_dist(words)
@@ -128,3 +130,4 @@ result = open(summary_path, 'w')
 result.write(summary)
 result.close()
 print('done')
+
