@@ -11,8 +11,8 @@ from collections import defaultdict
 
 #set local paths for txt files containing the article and another one for the 
 #created file where the summary will be printed onto
-article_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/article.txt')
-summary_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/sum.txt')
+article_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/article2.txt')
+summary_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/sum2.txt')
 
 #set stopwords with a few customs
 stop_words = nltk.corpus.stopwords.words('english')
@@ -67,34 +67,42 @@ def get_freq_dist(words):
 	#calculate the frequency of occurance for each word
 	#incrementing its frequency by one everytime it occurs
 	for word in words:
-		if word in freq_dist:
-			freq_dist[word] += 1
-		else:
-			freq_dist[word] = 1
+		if word not in stop_words:
+			if word not in freq_dist.keys():
+				freq_dist[word] = 1
+			else:
+				freq_dist[word] += 1
 
 	return freq_dist
+
+
+'''
+	max_freq = max(freq_dist.values())
+
+	for word in freq_dist.keys():
+		freq_dist[word] = (freq_dist[word] /max_freq)
+		'''
+
 
 #calculate the scores of each sentence
 #TODO: make this better
 def get_score(words, sentences, freq_dist):
 
-	max_freq = max(freq_dist.values())
-	sent_tokens = nltk.word_tokenize(sentences)
-
 	score = {}
-	#default = 'the'
-	#freq_dist = freq_dist.get('the', default)
+	sent_tokens = nltk.word_tokenize(sentences) 
 
 	for sentence in sentences:
 		for word in sent_tokens:
-			if sentence not in score.keys():
-				score[sentence] = freq_dist[word]
-			else:
-				score[sentence] += freq_dist[word]
+			if word in freq_dist.keys():
 
+				if sentence not in score.keys():
+					score[sentence] = freq_dist[word]
+					
+				else:
+					score[sentence] += freq_dist[word]
+	
 	return score
 	
-
 #define function that decides which sentences to 
 #include in the summary
 def get_summary(score, sentences, length):
@@ -103,7 +111,7 @@ def get_summary(score, sentences, length):
 	index = nlargest(length, score, key=score.get)
 	
 	#rearrange the sentence in sorted order
-	summary = [sentences[i] for i in sorted(index)]
+	summary = ' '.join(index)
 	
 	#join these sentences together into a shorter
 	#version of the original article
@@ -114,6 +122,10 @@ def get_summary(score, sentences, length):
 #call tokenization functions for words and sentences
 words = get_word_tokens()
 sentences = get_sent_tokens()
+
+#print(words)
+#print('============================================================================')
+#print(sentences)
 
 
 #call functions to get the frequency distribution and 
