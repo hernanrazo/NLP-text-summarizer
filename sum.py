@@ -2,9 +2,9 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords
-from nltk.probability import FreqDist
+import heapq
 from heapq import nlargest
-from collections import defaultdict
+import spacy #look into this
 import re
 
 #nltk.download('punkt')
@@ -25,11 +25,14 @@ stop_words.extend(custom)
 #toggle this if you wish
 length = 4
 
-def get_sent_tokens():
+def get_sent_tokens(path):
 
 	filtered_sent = []
 	
-	data = open(article_path, 'r').read()
+	file = open(path, 'r')
+	data = file.read()
+	file.close()
+
 	data = data.lower()
 	data = data.replace('\n', ' ')
 
@@ -42,11 +45,13 @@ def get_sent_tokens():
 
 	return str(filtered_sent)
 
-def get_word_tokens():
+def get_word_tokens(path):
 
 	filtered_words = []
 
-	data = open(article_path, 'r').read()
+	file= open(path, 'r')
+	data = file.read()
+	file.close()
 
 	data = data.lower()
 	data = data.replace('\n', ' ')
@@ -62,7 +67,6 @@ def get_word_tokens():
 
 	return filtered_words
 
-
 def get_freq_dist(words):
 
 	freq = {}
@@ -76,7 +80,7 @@ def get_freq_dist(words):
 	#max_freq = max(freq.values())
 
 	#for word in freq.keys():
-	#	freq[word] = (freq[word] / max_freq)
+		#freq[word] = (freq[word] / max_freq)
 
 	return freq
 
@@ -85,44 +89,37 @@ def get_score(sentences, freq_dist):
 	scores = {}
 	words = nltk.word_tokenize(sentences)
 
-	for sent in sentences:
-		for word in words:
-			if word in freq_dist.keys():
-				if sent not in scores.keys():
-					scores[sent] = freq_dist[word]
-
-				else:
-					scores[sent] += freq_dist[word]
+    for i, sentences in enumerate(sentences):
+    
+        for word in words:
+            if word in freq_dist:
+                score[i] += freq_dist[word]
 
 	return scores
 
 
+def get_summary(length, sentences, words, score):
+    
+    summary = heapq.nlargest(length, scores, key=scores.get)
+    full_summary = ' '.join(summary)
+
+    return full_summary
 
 
 
-sentences = get_sent_tokens()
-words = get_word_tokens()
+sentences = get_sent_tokens(article_path)
+words = get_word_tokens(article_path)
 freq_dist = get_freq_dist(words)
-
 scores = get_score(sentences, freq_dist)
+summary = get_summary(length, sentences, words, scores)
 
-print(sentences)
-print(words)
-print(freq_dist)
 print(scores)
+print(summary)
 
-word_list = []
-sent_list = []
 
-for sent in sentences:
-	for word in words:
-		word_list.append(word)
-		sent_list.append(sentences)
-print('================================')
-print(word_list)
-print('================================')
+#sent = ('%s' % ''.join(map(str, sentences)))
 
-print(sent_list)
+#sent = (''.join(list(chain.from_iterable(sentences))))
 
 
 
