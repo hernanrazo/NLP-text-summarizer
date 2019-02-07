@@ -4,7 +4,8 @@ from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords
 import heapq
 from heapq import nlargest
-import spacy #look into this
+import spacy
+from spacy.tokenizer import Tokenizer
 import re
 
 #nltk.download('punkt')
@@ -24,6 +25,26 @@ stop_words.extend(custom)
 #set number of sentences for the summary
 #toggle this if you wish
 length = 4
+
+
+'spacy experimentation----------------------------------------------------'
+nlp = spacy.load("en_core_web_md")
+
+def spacy_tokenizer(path):
+
+    file = open(path, 'r')
+    data - file.read()
+    file.close()
+
+    data.lower()
+    data.replace('\n', ' ')
+
+    tokenizer = Tokenizer(nlp.vocab)
+    tokens = Tokenizer(data)
+
+    return tokens
+
+'spacy experimentation------------------------------------------------' 
 
 def get_sent_tokens(path):
 
@@ -83,7 +104,7 @@ def get_freq_dist(words):
 		#freq[word] = (freq[word] / max_freq)
 
 	return freq
-
+'''
 def get_score(sentences, freq_dist):
 
 	scores = {}
@@ -96,7 +117,7 @@ def get_score(sentences, freq_dist):
                 score[i] += freq_dist[word]
 
 	return scores
-
+'''
 
 def get_summary(length, sentences, words, score):
     
@@ -110,12 +131,19 @@ def get_summary(length, sentences, words, score):
 sentences = get_sent_tokens(article_path)
 words = get_word_tokens(article_path)
 freq_dist = get_freq_dist(words)
-scores = get_score(sentences, freq_dist)
-summary = get_summary(length, sentences, words, scores)
+#scores = get_score(sentences, freq_dist)
+#summary = get_summary(length, sentences, words, scores)
 
-print(scores)
-print(summary)
 
+
+spacy = spacy_tokenizer(article_path)
+print(spacy)
+
+
+
+
+#print(scores)
+#print(summary)
 
 #sent = ('%s' % ''.join(map(str, sentences)))
 
