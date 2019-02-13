@@ -8,7 +8,6 @@ import re
 import spacy
 
 
-
 #nltk.download('punkt')
 #nltk.download('stopwords')
 
@@ -26,100 +25,6 @@ stop_words.extend(custom)
 #set number of sentences for the summary
 #toggle this if you wish
 length = 4
-
-
-nlp = spacy.load('en_core_web_sm')
-
-def get_sent_tokens(path):
-
-	file = open(path, 'r')
-	data = file.read()
-	file.close()
-
-	data = data.lower()
-	data = data.replace('\n', ' ')
-
-	doc = nlp(data)
-
-	sentences = [sent.string.strip() for sent in doc.sents]
-
-	return sentences
-
-
-
-#def get_word_tokens(path):
-
-
-
-
-
-sentences = get_sent_tokens(article_path)
-
-print(sentences)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 '''
 def get_sent_tokens(path):
