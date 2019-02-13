@@ -6,11 +6,15 @@ from spacy.lang.en.stop_words import STOP_WORDS
 article_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/article.txt')
 summary_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/sum.txt')
 
-length = 4
-
 nlp = spacy.load('en_core_web_sm')
 
+nlp.Defaults.stop_words |= {'?','(', ')', '.', '[', ']','!', 'th',';',"`","'",'"',',','$', '/'}
+
+length = 4
+
 def get_sent_tokens(path):
+
+    filtered_sent = []
 
     file = open(path, 'r')
     data = file.read()
@@ -21,17 +25,30 @@ def get_sent_tokens(path):
 
     doc = nlp(data)
     
-   # sentences = [sent.string.strip() for sent in doc.sent]
     
+            
+    return filtered_sent
+    
+
+def get_word_tokens(path):
+    
+    filtered_words = []
+
+    file = open(path, 'r')
+    data = file.read()
+    file = close()
+
+    data = data.lower()
+    datta = data.replace('\n', ' ')
+
+    doc = nlp(data)
+
     for word in doc:
         if word.is_stop == False:
-            
+            filtered_words.append(word)
 
+    return filtered_words
 
-
-
-
-    return sentences
     
 
 
@@ -39,7 +56,7 @@ def get_sent_tokens(path):
 
 
 
-print(STOP_WORDS)
+
 
 
 sentences = get_sent_tokens(article_path)
