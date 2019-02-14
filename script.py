@@ -2,7 +2,6 @@ import spacy
 from spacy.lang.en.stop_words import STOP_WORDS
 
 
-
 article_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/article.txt')
 summary_path = ('/Users/hernanrazo/pythonProjects/NLP_summarizer/sum.txt')
 
@@ -12,23 +11,6 @@ nlp.Defaults.stop_words |= {'?','(', ')', '.', '[', ']','!', 'th',';',"`","'",'"
 
 length = 4
 
-def get_sent_tokens(path):
-
-    filtered_sent = []
-
-    file = open(path, 'r')
-    data = file.read()
-    file.close()
-
-    data = data.lower()
-    data = data.replace('\n', ' ')
-
-    doc = nlp(data)
-    
-    
-            
-    return filtered_sent
-    
 
 def get_word_tokens(path):
     
@@ -36,7 +18,7 @@ def get_word_tokens(path):
 
     file = open(path, 'r')
     data = file.read()
-    file = close()
+    file.close()
 
     data = data.lower()
     datta = data.replace('\n', ' ')
@@ -50,16 +32,35 @@ def get_word_tokens(path):
     return filtered_words
 
     
+def get_sent_tokens(path):
+
+    filtered_sent = []
+    
+    words = get_word_tokens(path)
+
+    sentences = (''.join(str(words)))
+
+    for sentence in sentences:
+        filtered_sent.append(sentence)
+
+    return filtered_sent
+
+
+#sent = ('%s' % ''.join(map(str, sentences)))
+
+#sent = (''.join(list(chain.from_iterable(sentences))))
+
+    
 
 
 
-
-
-
-
-
+#words = get_word_tokens(article_path)
+#print(words)
 
 sentences = get_sent_tokens(article_path)
+
 print(sentences)
+
+
 
 
