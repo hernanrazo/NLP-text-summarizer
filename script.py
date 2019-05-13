@@ -1,10 +1,12 @@
 import os
+from collections import Counter
 import nltk
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from gensim.models import Phrases
 from gensim.models.Phrases import Phraser
+
 
 #nltk.download('punkt')
 #nltk.download('stopwords')
@@ -33,6 +35,17 @@ def sentence_intersect(s1, s2):
 
     return intersect_calc
 
+def get_scores(words, sentences):
+
+    scores = Counter()
+    for words in words:
+        for i in range(0, len(sentences)):
+            scores[i] = scores[i] + word[1]
+
+    sent_scores = sorted(scores.items(), key = scores.__getitem__, reverse=True)
+
+    return sent_scores
+
 def sentence_split(sents):
 
     sentences = [[i for i in word_tokenize(sents) if i not in stop_words] for sent in sents]
@@ -41,19 +54,36 @@ def sentence_split(sents):
     bigram_tokens = bigram_phraser[sentences]
     trigram_phraser = Phraser(trigram)
     trigram_tokens = trigram_phraser[bigram_tokens]
-    tokens = [i for i in trigram_tokens]
+    
+    all_words = [i for j in trigram_tokens for i in j]
+    frequent_words = [i for i in Counter(all_words).most_common() if i[1] > 1]
+    sentences = [i for i in trigram_tokens]
 
-    return tokens
-
-
-
-
-
+    return frequent_words, sentences
 
 
+def get_summary(text, limit=3):
+
+    sents = sent_tokenize(text)
+    frequent_words = sentence_split(sents)
+    sentences = sentence_split(sents)
+    scores = get_scores(frequent_words, sentences)
+
+    limited_sents = [sents[num] for num, count in scores[:limit]]
+    best_sents = [i[0] for i in sorted([(i, text.find(i)) for i in limited_sents], key = lambda x:x[0])]
+
+    summary = (' '.join(best_sents))
+
+    return summary
 
 
-get_article(article_path)
+
+
+text = get_article(article_path)
+
+summary = get_summary(text, 5)
+
+print(summary)
 
 
 
