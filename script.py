@@ -20,10 +20,22 @@ def get_article(article):
 
     text = open(article).read().lower()
 
-    print(text)
+    return text
+
+
+def sent_intersect(s1, s2):
+
+    sent1 = [i for i in word_tokenize(s1) if i not in stopwords]
+    sent2 = [i for i in word_tokenize(s2) if i not in stopwords]
+    intersect = [i for i in sent1 if i in sent2]
+    inertsect_calc = (len(intersection) / (len(sent1) +len(sent2)) / 2)
+
+    return intersect_calc
 
 
 
 
 get_article(article_path)
+
+
 
