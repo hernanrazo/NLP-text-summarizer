@@ -7,6 +7,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from gensim.models.phrases import Phraser
+from gensim.models import Phrases
 
 #nltk.download('punkt')
 #nltk.download('stopwords')
@@ -22,60 +23,60 @@ punctuation = list(string.punctuation)
 lemma = WordNetLemmatizer()
 stop = stop_words + punctuation 
 
+
 def get_article(article):
 
     text = open(article).read()
+    text = text.lower()
+
     return text
 
-def clean_data(text):
-
-    filtered_text = []
-    text = text.lower()
-    tokenized_lyrics = nltk.word_tokenize(text)
-    filtered_lyrics = [words for words in tokenized_lyrics if not words in stop_words]
-
-    for words in tokenized_lyrics:
-        if words not in stop_words:
-            filtered_text.append(words)
-
-    return filtered_text
-
-
-
-
 def intersection(sent1, sent2):
-    s1 = sent1.split(' ')
-    s2 = sent2.split(' ')
 
-    intersection = [i for i in s1 if i in s2]
-    #Normalization
-    return len(intersection) / ((len(s1) + len(s2)) / 2)
+    intersection = [i for i in sent1 if i in sent2]
+    normalize = len(intersection) / ((len(sent1) + len(sent2)) / 2)
+
+    return normalize
+
+
+def split_sentences(text):
+
+    sentence_stream = [[i for i in word_tokenize(sent) if i not in stop_words] for sent in text]
+
+    bigram = Phrases(sentence_stream, min_count = 2, threshold = 2, delimiter = b'_')
+    bigram_phraser = Phraser(bigram)
+    bigram_tokens = bigram_phraser[sentence_stream]
+
+    trigram = Phrases(bigram_tokens, min_count = 2, threshold = 2, delimiter = b'_')
+    trigram_phraser = Phraser(trigram)
+    trigram_tokens = trigram_phraser[bigram_tokens]
+    result = [i for i in trigram_tokens]
+
+    return result
+
+
 
 def get_summary(text, limit = 3):
 
-    sentences = sent_tokenize()
+    sentences = split_sentences(text)
+    matrix = [[intersection(sentences[i], sentences[j]) for i in range(0, len(sentences))] for j in range(0, len(sentences))]
+
+    scores = {text[i]: sum(matrix[i]) for i in range(len(matrix))}
+    sentences = sorted(scores, key = scores.__getitem__, reverse = True)[:limit]
+    best_sents = [i[0] for i in sorted([(i, text.find(i)) for i in sentences], key = lambda x: x[0])]
+
+    return best_sents
+
 
 
 text = get_article(article_path)
+
+split = split_sentences(text) #shit isnt splitting right
+print(split)
 '''
-sentences = sent_tokenize(text)
-matrix = [[intersection(sentences[i], sentences[j]) for i in range(0,len(sentences))] for j in range(0,len(sentences))]
+summary = get_summary(text)
+
+print(' '.join(summary))
 
 
-scores = {sentences[i]: sum(matrix[i]) for i in range(len(matrix))}
-sents = sorted(scores, key = scores.__getitem__, reverse = True)[:5]
-
-
-tuples = [(i, text.find(i)) for i in sents]
-sorted_tuples = sorted(tuples, key = lambda x: x[0])
-
-best_sents = [i[0] for i in sorted_tuples]
-
-print(best_sents)
 '''
-
-cleaned_text = clean_data(text)
-print(cleaned_text)
-
-
-
